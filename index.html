@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Standort senden</title>
+<style>
+body { font-family: sans-serif; padding: 2rem; }
+button { padding: 1rem; font-size: 1rem; }
+pre { background:#f4f4f4; padding:1rem; }
+</style>
+</head>
+<body>
+
+<h1>Standort senden</h1>
+<button onclick="sendLocation()">Standort senden</button>
+<pre id="out"></pre>
+
+<script>
+function sendLocation() {
+  if (!navigator.geolocation) {
+    alert("GPS nicht verfügbar");
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const data = {
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        accuracy: pos.coords.accuracy
+      };
+
+      document.getElementById("out").textContent =
+        JSON.stringify(data, null, 2);
+
+      fetch("/.netlify/functions/saveLocation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+    },
+    err => alert("Standort abgelehnt")
+  );
+}
+</script>
+
+</body>
+</html>
